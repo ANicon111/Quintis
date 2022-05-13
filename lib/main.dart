@@ -6,6 +6,7 @@ import 'package:quintis/settings.dart';
 void main() async {
   await GetStorage.init("quintis/data");
   GetStorage("quintis/data").writeIfNull("number", "0");
+  GetStorage("quintis/data").writeIfNull("enabled", "1" * 20);
   runApp(const Quintis());
 }
 

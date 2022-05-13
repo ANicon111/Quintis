@@ -262,14 +262,25 @@ class _PieceListState extends State<PieceList> {
                       height: 50 * RelSize(context).pixel(),
                       width: 160 * RelSize(context).pixel(),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent,
+                        color: Pieces.isEnabled(i)
+                            ? Colors.redAccent
+                            : Colors.greenAccent,
                         borderRadius: BorderRadius.circular(
                           10 * RelSize(context).pixel(),
                         ),
                       ),
                       child: InkWell(
-                        hoverColor: Colors.redAccent.shade400,
-                        onTap: () {},
+                        hoverColor: Pieces.isEnabled(i)
+                            ? Colors.redAccent.shade400
+                            : Colors.greenAccent.shade400,
+                        onTap: () {
+                          if (Pieces.isEnabled(i)) {
+                            Pieces.disable(i);
+                          } else {
+                            Pieces.enable(i);
+                          }
+                          setState(() {});
+                        },
                         borderRadius: BorderRadius.circular(
                           10 * RelSize(context).pixel(),
                         ),
@@ -281,7 +292,7 @@ class _PieceListState extends State<PieceList> {
                               size: 50 * RelSize(context).pixel(),
                             ),
                             Text(
-                              "Disable",
+                              Pieces.isEnabled(i) ? "Disable" : "Enable",
                               style: TextStyle(
                                 fontSize: 25 * RelSize(context).pixel(),
                               ),
@@ -340,14 +351,25 @@ class _PieceListState extends State<PieceList> {
                       height: 50 * RelSize(context).pixel(),
                       width: 160 * RelSize(context).pixel(),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent,
+                        color: Pieces.isEnabled(i + 10)
+                            ? Colors.redAccent
+                            : Colors.greenAccent,
                         borderRadius: BorderRadius.circular(
                           10 * RelSize(context).pixel(),
                         ),
                       ),
                       child: InkWell(
-                        hoverColor: Colors.redAccent.shade400,
-                        onTap: () {},
+                        hoverColor: Pieces.isEnabled(i + 10)
+                            ? Colors.redAccent.shade400
+                            : Colors.greenAccent.shade400,
+                        onTap: () {
+                          if (Pieces.isEnabled(i + 10)) {
+                            Pieces.disable(i + 10);
+                          } else {
+                            Pieces.enable(i + 10);
+                          }
+                          setState(() {});
+                        },
                         borderRadius: BorderRadius.circular(
                           10 * RelSize(context).pixel(),
                         ),
@@ -359,7 +381,7 @@ class _PieceListState extends State<PieceList> {
                               size: 50 * RelSize(context).pixel(),
                             ),
                             Text(
-                              "Disable",
+                              Pieces.isEnabled(i + 10) ? "Disable" : "Enable",
                               style: TextStyle(
                                 fontSize: 25 * RelSize(context).pixel(),
                               ),

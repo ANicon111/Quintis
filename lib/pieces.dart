@@ -198,9 +198,39 @@ class Pieces {
     GetStorage("quintis/data").remove(i.toString());
   }
 
+  static void disable(int i) {
+    String oldList = GetStorage("quintis/data").read("enabled");
+    String list = oldList.substring(0, i) + "0" + oldList.substring(i + 1, 20);
+    GetStorage("quintis/data").write("enabled", list);
+  }
+
+  static void enable(int i) {
+    String oldList = GetStorage("quintis/data").read("enabled");
+    String list = oldList.substring(0, i) + "1" + oldList.substring(i + 1, 20);
+    GetStorage("quintis/data").write("enabled", list);
+  }
+
+  static bool isEnabled(int i) {
+    String list = GetStorage("quintis/data").read("enabled");
+    return list[i] == "1";
+  }
+
+  static List<int> getEnabledList() {
+    List<int> enabled = [];
+    String list = GetStorage("quintis/data").read("enabled");
+    int number = int.parse(GetStorage("quintis/data").read("number")) + 10;
+    for (int i = 0; i < number; i++) {
+      if (list[i] == "1") {
+        enabled.add(i);
+      }
+    }
+    return enabled;
+  }
+
   static Piece random() {
-    return index(Random()
-        .nextInt(10 + int.parse(GetStorage("quintis/data").read("number"))));
+    List<int> enabled = getEnabledList();
+    print(enabled);
+    return index(enabled[Random().nextInt(enabled.length)]);
   }
 
   //de implementat dezactivare pieselor
