@@ -51,7 +51,7 @@ class _PagesState extends State<Pages> {
       ),
       body: settingsOpen
           ? const Settings()
-          : const Board(
+          : const BoardGui(
               height: 25,
               width: 25,
               maxSize: 950,

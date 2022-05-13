@@ -2,6 +2,44 @@ import 'dart:math';
 
 import 'package:get_storage/get_storage.dart';
 
+String customEncoding(int i) {
+  switch (i) {
+    case 10:
+      return "a";
+    case 11:
+      return "b";
+    case 12:
+      return "c";
+    case 13:
+      return "d";
+    case 14:
+      return "e";
+    case 15:
+      return "f";
+    default:
+      return i.toString();
+  }
+}
+
+int customDecoding(String val) {
+  switch (val) {
+    case "a":
+      return 10;
+    case "b":
+      return 11;
+    case "c":
+      return 12;
+    case "d":
+      return 13;
+    case "e":
+      return 14;
+    case "f":
+      return 15;
+    default:
+      return int.parse(val);
+  }
+}
+
 class Piece {
   bool initd = false;
   List<List<int>> _deg90 = [];
@@ -38,7 +76,7 @@ class Piece {
     String value = "";
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
-        value += shape[i][j].toString();
+        value += customEncoding(shape[i][j]);
       }
     }
     GetStorage("quintis/data")
@@ -53,7 +91,7 @@ class Piece {
         Piece(List.generate(5, ((_) => List.generate(5, ((_) => 0)))));
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
-        piece.shape[i][j] = int.parse(value[i * 5 + j]);
+        piece.shape[i][j] = customDecoding(value[i * 5 + j]);
       }
     }
     return piece;
@@ -153,7 +191,7 @@ class Pieces {
     [
       [0, 0, 10, 0, 0],
       [0, 0, 10, 0, 0],
-      [0, 0, 10, 10, 0],
+      [0, 10, 10, 0, 0],
       [0, 0, 10, 0, 0],
       [0, 0, 0, 0, 0],
     ],
@@ -229,8 +267,10 @@ class Pieces {
 
   static Piece random() {
     List<int> enabled = getEnabledList();
-    return index(enabled[Random().nextInt(enabled.length)]);
+    if (enabled.isNotEmpty) {
+      return index(enabled[Random().nextInt(enabled.length)]);
+    } else {
+      return Piece(List.generate(5, (_) => List.generate(5, (_) => 0)));
+    }
   }
-
-  //de implementat dezactivare pieselor
 }

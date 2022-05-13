@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quintis/definitions.dart';
 import 'package:quintis/logic.dart';
-import 'package:quintis/pieces.dart';
 
 class Cell extends StatefulWidget {
   final Color color;
@@ -50,11 +50,11 @@ class _CellState extends State<Cell> {
   }
 }
 
-class Board extends StatefulWidget {
+class BoardGui extends StatefulWidget {
   final int height;
   final int width;
   final double maxSize;
-  const Board({
+  const BoardGui({
     Key? key,
     required this.height,
     required this.width,
@@ -62,74 +62,137 @@ class Board extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<Board> createState() => _BoardState();
+  State<BoardGui> createState() => _BoardGuiState();
 }
 
-class _BoardState extends State<Board> {
-  List<List<int>>? pieces;
+class _BoardGuiState extends State<BoardGui> {
+  Board board = Board();
+  FocusNode node = FocusNode();
 
   @override
   void initState() {
-    pieces = List.generate(
-      widget.height,
-      (_) => List.generate(
-        widget.width,
-        (_) => 0,
-      ),
-    );
+    board = Board(widget.width, widget.height, () {
+      setState(() {});
+    });
     super.initState();
   }
 
   @override
+  void dispose() {
+    node.dispose();
+    board.delete();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (board.gameOver) board.start();
+    node.requestFocus();
     return Center(
-      child: Column(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: List.generate(
-              widget.height,
-              (i) => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(
-                  widget.width,
-                  (j) => Cell(
-                    color: pieceColors[pieces![i][j]],
-                    size: 1 *
-                        widget.maxSize *
-                        RelSize(context).pixel() /
-                        (widget.height > widget.width
-                            ? widget.height
-                            : widget.width),
+      child: RawKeyboardListener(
+        focusNode: node,
+        onKey: (event) {
+          if (event.isKeyPressed(LogicalKeyboardKey.space)) {
+            board.fastForward();
+          }
+          if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+            board.moveCurrentPiece(-1);
+          }
+          if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+            board.moveCurrentPiece(1);
+          }
+          if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+            board.rotateCurrentPiece();
+          }
+          if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+            board.runGameTick();
+          }
+        },
+        child: ListView(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: List.generate(
+                widget.height,
+                (i) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    widget.width,
+                    (j) => Cell(
+                      color: pieceColors[board.board[i][j]],
+                      size: 1 *
+                          widget.maxSize *
+                          RelSize(context).pixel() /
+                          (widget.height > widget.width
+                              ? widget.height
+                              : widget.width),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Ink(
-            width: 50 * RelSize(context).pixel(),
-            height: 50 * RelSize(context).pixel(),
-            color: Colors.red,
-            child: InkWell(
-              onTap: () {
-                pieces = List.generate(
-                  widget.height,
-                  (_) => List.generate(
-                    widget.width,
-                    (_) => 0,
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Next piece:",
+                    style: TextStyle(fontSize: 64 * RelSize(context).pixel()),
                   ),
-                );
-                for (int i = 0; i < 5; i++) {
-                  for (int j = 0; j < 5; j++) {
-                    setPiece(
-                        pieces!, Pieces.random(), (i + j) % 4, 5 * i, 5 * j);
-                  }
-                }
-                setState(() {});
-              },
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.white,
+                      ),
+                    ),
+                    width: 135 * RelSize(context).pixel(),
+                    height: 135 * RelSize(context).pixel(),
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(
+                          5,
+                          (j) => Column(
+                            children: List.generate(
+                              5,
+                              (k) => Row(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(
+                                        2 * RelSize(context).pixel()),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: board.nextPiece[board
+                                                    .nextPieceRotation][k][j] ==
+                                                0
+                                            ? null
+                                            : pieceColors[board.nextPiece[
+                                                board.nextPieceRotation][k][j]],
+                                      ),
+                                      height: 20 * RelSize(context).pixel(),
+                                      width: 20 * RelSize(context).pixel(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100 * RelSize(context).pixel(),
+                  ),
+                  Text(
+                    "Score: " + board.points.toString(),
+                    style: TextStyle(fontSize: 64 * RelSize(context).pixel()),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
