@@ -229,7 +229,6 @@ class Pieces {
 
   static Piece random() {
     List<int> enabled = getEnabledList();
-    print(enabled);
     return index(enabled[Random().nextInt(enabled.length)]);
   }
 
