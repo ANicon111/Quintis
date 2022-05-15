@@ -16,16 +16,18 @@ class RelSize {
   }
 }
 
-List<Color> pieceColors = [
-  Colors.grey.shade700,
-  Colors.white,
-  Colors.yellow.shade700,
-  Colors.teal.shade600,
+List<MaterialColor> pieceColors = [
+  MaterialColor(Colors.grey.shade700.value,
+      {700: Colors.grey.shade800, 800: Colors.grey.shade900}), //empty cell
+  MaterialColor(Colors.white.value,
+      {700: Colors.grey.shade300, 800: Colors.grey.shade500}), //pseudo-white
+  Colors.teal,
   Colors.purple,
-  Colors.red.shade300,
-  Colors.red.shade800,
-  Colors.green.shade300,
-  Colors.green.shade800,
-  Colors.blue.shade300,
-  Colors.blue.shade800,
+  Colors.amber,
+  Colors.red,
+  Colors.pink,
+  Colors.lightGreen,
+  Colors.green,
+  Colors.blue,
+  Colors.indigo,
 ];

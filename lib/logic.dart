@@ -16,8 +16,9 @@ class Board {
   int pieceX = 0;
   int pieceY = 0;
 
-  Duration frequency = const Duration(milliseconds: 500);
+  Duration frequency = const Duration(milliseconds: 750);
   Timer? gameTimer;
+  Stopwatch elapsedTime = Stopwatch();
   bool gameOver = false;
   int points = 0;
   final Function updateGui;
@@ -27,13 +28,11 @@ class Board {
   //init functions
   Board([this.width = 0, this.height = 0, this.updateGui = _]) {
     start();
-    gameTimer = Timer.periodic(frequency, (_) {
-      if (board.isNotEmpty) runGameTick();
-    });
   }
 
   void delete() {
     gameTimer?.cancel();
+    elapsedTime.stop();
   }
 
   //piece-related functions
@@ -46,29 +45,80 @@ class Board {
   }
 
   void moveCurrentPiece(int relX) {
-    deleteCurrentPiece();
-    if (isPosValid(
-        board, currentPiece, currentPieceRotation, pieceY, pieceX + relX)) {
-      pieceX += relX;
+    if (!gameOver) {
+      deleteCurrentPiece();
+      while (isPosValid(board, currentPiece, currentPieceRotation, pieceY,
+              pieceX + relX.sign) &&
+          relX != 0) {
+        pieceX += relX.sign;
+        relX -= relX.sign;
+      }
+      playerInteraction();
     }
-    setCurrentPiece();
-    updateGui();
   }
 
   void rotateCurrentPiece() {
-    deleteCurrentPiece();
-    if (isPosValid(
-        board, currentPiece, (currentPieceRotation + 1) % 4, pieceY, pieceX)) {
-      currentPieceRotation = (currentPieceRotation + 1) % 4;
+    if (!gameOver) {
+      deleteCurrentPiece();
+      if (isPosValid(board, currentPiece, (currentPieceRotation + 1) % 4,
+          pieceY, pieceX)) {
+        currentPieceRotation = (currentPieceRotation + 1) % 4;
+      }
+      playerInteraction();
     }
+  }
+
+  //game-related functions
+
+  void start() {
+    board = List.generate(
+      height,
+      (_) => List.generate(
+        width,
+        (_) => 0,
+      ),
+    );
+    pieceX = width ~/ 2 - 2;
+    points = 0;
+    gameOver = false;
+    runTimer();
+    updateGui();
+  }
+
+  void runTimer() {
+    elapsedTime.reset();
+    elapsedTime.start();
+    gameTimer?.cancel();
+    gameTimer = Timer(frequency, () {
+      if (board.isNotEmpty) runGameTick();
+      runTimer();
+    });
+  }
+
+  void pauseTimer() {
+    gameTimer?.cancel();
+    if (elapsedTime.elapsed < frequency * 2) {
+      gameTimer = Timer(frequency * 0.5, () {
+        if (board.isNotEmpty) runGameTick();
+        runTimer();
+      });
+    } else {
+      if (board.isNotEmpty) runGameTick();
+      runTimer();
+    }
+  }
+
+  void playerInteraction() {
+    pauseTimer();
     setCurrentPiece();
     updateGui();
   }
 
-  //game-related functions
   void fastForward() {
-    while (pieceY != 0) {
-      runGameTick();
+    if (!gameOver) {
+      while (pieceY != 0) {
+        runGameTick();
+      }
     }
   }
 
@@ -93,40 +143,30 @@ class Board {
   }
 
   void runGameTick() {
-    deleteCurrentPiece();
-    if (isPosValid(
-        board, currentPiece, currentPieceRotation, pieceY + 1, pieceX)) {
-      pieceY++;
-    } else {
-      setCurrentPiece();
-      linesToPoints();
-      currentPiece = nextPiece;
-      currentPieceRotation = nextPieceRotation;
-      nextPiece = Pieces.random();
-      nextPieceRotation = Random().nextInt(4);
-      pieceX = width ~/ 2 - 2;
-      pieceY = 0;
+    if (!gameOver) {
+      deleteCurrentPiece();
+      if (isPosValid(
+          board, currentPiece, currentPieceRotation, pieceY + 1, pieceX)) {
+        pieceY++;
+      } else {
+        setCurrentPiece();
+        linesToPoints();
+        currentPiece = nextPiece;
+        currentPieceRotation = nextPieceRotation;
+        nextPiece = Pieces.random();
+        nextPieceRotation = Random().nextInt(4);
+        pieceX = width ~/ 2 - 2;
+        pieceY = 0;
+      }
+      if (isPosValid(
+          board, currentPiece, currentPieceRotation, pieceY, pieceX)) {
+        setCurrentPiece();
+      } else {
+        gameTimer?.cancel();
+        gameOver = true;
+      }
+      updateGui();
     }
-    if (isPosValid(board, currentPiece, currentPieceRotation, pieceY, pieceX)) {
-      setCurrentPiece();
-    } else {
-      gameOver = true;
-    }
-    updateGui();
-  }
-
-  void start() {
-    board = List.generate(
-      height,
-      (_) => List.generate(
-        width,
-        (_) => 0,
-      ),
-    );
-    pieceX = width ~/ 2 - 2;
-    points = 0;
-    gameOver = false;
-    updateGui();
   }
 }
 

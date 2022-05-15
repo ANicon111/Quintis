@@ -3,6 +3,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:quintis/board.dart';
 import 'package:quintis/settings.dart';
 
+import 'definitions.dart';
+
 void main() async {
   await GetStorage.init("quintis/data");
   GetStorage("quintis/data").writeIfNull("number", "0");
@@ -51,10 +53,11 @@ class _PagesState extends State<Pages> {
       ),
       body: settingsOpen
           ? const Settings()
-          : const BoardGui(
+          : BoardGui(
               height: 25,
               width: 25,
-              maxSize: 950,
+              maxSize: 1000 * RelSize(context).pixel() -
+                  AppBar().preferredSize.height,
             ),
     );
   }

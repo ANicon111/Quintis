@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:quintis/cell.dart';
 import 'package:quintis/definitions.dart';
 import 'package:quintis/pieces.dart';
 
@@ -68,42 +69,13 @@ class _PieceAdderState extends State<PieceAdder> {
               mainAxisSize: MainAxisSize.min,
               children: List.generate(
                 5,
-                (j) => Padding(
-                  padding: EdgeInsets.all(4 * RelSize(context).pixel()),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: pieceColors[piece.shape[i][j]],
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.shade800,
-                          width: 16 * RelSize(context).pixel(),
-                        ),
-                        right: BorderSide(
-                          color: Colors.grey.shade800,
-                          width: 16 * RelSize(context).pixel(),
-                        ),
-                        top: BorderSide(
-                          color: Colors.grey.shade600,
-                          width: 16 * RelSize(context).pixel(),
-                        ),
-                        left: BorderSide(
-                          color: Colors.grey.shade600,
-                          width: 16 * RelSize(context).pixel(),
-                        ),
-                      ),
-                    ),
-                    height: 160 * RelSize(context).pixel(),
-                    width: 160 * RelSize(context).pixel(),
-                    child: InkWell(
-                      onTap: () {
-                        setState(
-                          () {
-                            piece.shape[i][j] = color;
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                (j) => Cell(
+                  color: pieceColors[piece.shape[i][j]],
+                  size: 200 * RelSize(context).pixel(),
+                  onTap: () {
+                    piece.shape[i][j] = color;
+                    setState(() {});
+                  },
                 ),
               ),
             ),
@@ -220,102 +192,13 @@ class _PieceListState extends State<PieceList> {
       children: [
         Column(
           children: List.generate(
-            10,
-            (i) => Padding(
-              padding: EdgeInsets.all(
-                20 * RelSize(context).pixel(),
-              ),
-              child: SizedBox(
-                width: 800 * RelSize(context).pixel(),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: List.generate(
-                        5,
-                        (j) => Column(
-                          children: List.generate(
-                            5,
-                            (k) => Row(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(
-                                      2 * RelSize(context).pixel()),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Pieces.index(i)[0][k][j] == 0
-                                          ? null
-                                          : pieceColors[Pieces.index(i).shape[k]
-                                              [j]],
-                                    ),
-                                    height: 20 * RelSize(context).pixel(),
-                                    width: 20 * RelSize(context).pixel(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Ink(
-                      height: 50 * RelSize(context).pixel(),
-                      width: 160 * RelSize(context).pixel(),
-                      decoration: BoxDecoration(
-                        color: Pieces.isEnabled(i)
-                            ? Colors.redAccent
-                            : Colors.greenAccent,
-                        borderRadius: BorderRadius.circular(
-                          10 * RelSize(context).pixel(),
-                        ),
-                      ),
-                      child: InkWell(
-                        hoverColor: Pieces.isEnabled(i)
-                            ? Colors.redAccent.shade400
-                            : Colors.greenAccent.shade400,
-                        onTap: () {
-                          if (Pieces.isEnabled(i)) {
-                            Pieces.disable(i);
-                          } else {
-                            Pieces.enable(i);
-                          }
-                          setState(() {});
-                        },
-                        borderRadius: BorderRadius.circular(
-                          10 * RelSize(context).pixel(),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.not_interested,
-                              size: 50 * RelSize(context).pixel(),
-                            ),
-                            Text(
-                              Pieces.isEnabled(i) ? "Disable" : "Enable",
-                              style: TextStyle(
-                                fontSize: 25 * RelSize(context).pixel(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        Column(
-          children: List.generate(
             widget.pieceCount,
             (i) => Padding(
               padding: EdgeInsets.all(
                 20 * RelSize(context).pixel(),
               ),
               child: SizedBox(
-                width: 800 * RelSize(context).pixel(),
+                width: 506 * RelSize(context).pixel(),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -325,75 +208,67 @@ class _PieceListState extends State<PieceList> {
                         (j) => Column(
                           children: List.generate(
                             5,
-                            (k) => Row(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(
-                                      2 * RelSize(context).pixel()),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Pieces.index(i + 10)[0][k][j] == 0
-                                          ? null
-                                          : pieceColors[
-                                              Pieces.index(i + 10).shape[k][j]],
-                                    ),
-                                    height: 20 * RelSize(context).pixel(),
-                                    width: 20 * RelSize(context).pixel(),
-                                  ),
-                                ),
-                              ],
+                            (k) => Cell(
+                              color:
+                                  pieceColors[Pieces.index(i + 10).shape[k][j]],
+                              size: 30 * RelSize(context).pixel(),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Ink(
-                      height: 50 * RelSize(context).pixel(),
-                      width: 160 * RelSize(context).pixel(),
-                      decoration: BoxDecoration(
-                        color: Pieces.isEnabled(i + 10)
-                            ? Colors.redAccent
-                            : Colors.greenAccent,
-                        borderRadius: BorderRadius.circular(
-                          10 * RelSize(context).pixel(),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          20 * RelSize(context).pixel(), 0, 0, 0),
+                      child: Ink(
+                        height: 50 * RelSize(context).pixel(),
+                        width: 160 * RelSize(context).pixel(),
+                        decoration: BoxDecoration(
+                          color: Pieces.isEnabled(i + 10)
+                              ? Colors.redAccent
+                              : Colors.greenAccent,
+                          borderRadius: BorderRadius.circular(
+                            10 * RelSize(context).pixel(),
+                          ),
                         ),
-                      ),
-                      child: InkWell(
-                        hoverColor: Pieces.isEnabled(i + 10)
-                            ? Colors.redAccent.shade400
-                            : Colors.greenAccent.shade400,
-                        onTap: () {
-                          if (Pieces.isEnabled(i + 10)) {
-                            Pieces.disable(i + 10);
-                          } else {
-                            Pieces.enable(i + 10);
-                          }
-                          setState(() {});
-                        },
-                        borderRadius: BorderRadius.circular(
-                          10 * RelSize(context).pixel(),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.not_interested,
-                              size: 50 * RelSize(context).pixel(),
-                            ),
-                            Text(
-                              Pieces.isEnabled(i + 10) ? "Disable" : "Enable",
-                              style: TextStyle(
-                                fontSize: 25 * RelSize(context).pixel(),
+                        child: InkWell(
+                          hoverColor: Pieces.isEnabled(i + 10)
+                              ? Colors.redAccent.shade400
+                              : Colors.greenAccent.shade400,
+                          onTap: () {
+                            if (Pieces.isEnabled(i + 10)) {
+                              Pieces.disable(i + 10);
+                            } else {
+                              Pieces.enable(i + 10);
+                            }
+                            setState(() {});
+                          },
+                          borderRadius: BorderRadius.circular(
+                            10 * RelSize(context).pixel(),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.not_interested,
+                                size: 50 * RelSize(context).pixel(),
                               ),
-                            ),
-                          ],
+                              Text(
+                                Pieces.isEnabled(i + 10)
+                                    ? "Disable"
+                                    : "Enable ",
+                                style: TextStyle(
+                                  fontSize: 25 * RelSize(context).pixel(),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(
-                        20 * RelSize(context).pixel(),
-                      ),
+                      padding: EdgeInsets.fromLTRB(
+                          20 * RelSize(context).pixel(), 0, 0, 0),
                       child: Ink(
                         height: 50 * RelSize(context).pixel(),
                         width: 160 * RelSize(context).pixel(),
@@ -421,6 +296,85 @@ class _PieceListState extends State<PieceList> {
                               ),
                               Text(
                                 "Remove",
+                                style: TextStyle(
+                                  fontSize: 25 * RelSize(context).pixel(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        Column(
+          children: List.generate(
+            10,
+            (i) => Padding(
+              padding: EdgeInsets.all(
+                20 * RelSize(context).pixel(),
+              ),
+              child: SizedBox(
+                width: 506 * RelSize(context).pixel(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: List.generate(
+                        5,
+                        (j) => Column(
+                          children: List.generate(
+                              5,
+                              (k) => Cell(
+                                    color: pieceColors[Pieces.index(i).shape[k]
+                                        [j]],
+                                    size: 30 * RelSize(context).pixel(),
+                                  )),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          20 * RelSize(context).pixel(), 0, 0, 0),
+                      child: Ink(
+                        height: 50 * RelSize(context).pixel(),
+                        width: 160 * RelSize(context).pixel(),
+                        decoration: BoxDecoration(
+                          color: Pieces.isEnabled(i)
+                              ? Colors.redAccent
+                              : Colors.greenAccent,
+                          borderRadius: BorderRadius.circular(
+                            10 * RelSize(context).pixel(),
+                          ),
+                        ),
+                        child: InkWell(
+                          hoverColor: Pieces.isEnabled(i)
+                              ? Colors.redAccent.shade400
+                              : Colors.greenAccent.shade400,
+                          onTap: () {
+                            if (Pieces.isEnabled(i)) {
+                              Pieces.disable(i);
+                            } else {
+                              Pieces.enable(i);
+                            }
+                            setState(() {});
+                          },
+                          borderRadius: BorderRadius.circular(
+                            10 * RelSize(context).pixel(),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.not_interested,
+                                size: 50 * RelSize(context).pixel(),
+                              ),
+                              Text(
+                                Pieces.isEnabled(i) ? "Disable" : "Enable ",
                                 style: TextStyle(
                                   fontSize: 25 * RelSize(context).pixel(),
                                 ),
