@@ -24,8 +24,12 @@ class BoardGui extends StatefulWidget {
 class _BoardGuiState extends State<BoardGui> {
   Board board = Board();
   FocusNode node = FocusNode();
-  int movement = 0;
+  int initHorizontalPieceSwipePos = -1;
+  Offset initSwipePos = const Offset(0, 0);
+  Offset currentSwipePos = const Offset(0, 0);
   Timer? horizontalTimer;
+  int keyboardMovementX = 0;
+  int keyboardMovementY = 0;
 
   @override
   void initState() {
@@ -34,7 +38,11 @@ class _BoardGuiState extends State<BoardGui> {
       setState(() {});
     });
     horizontalTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-      if (movement != 0) board.moveCurrentPiece(movement);
+      if (keyboardMovementX != 0) board.moveCurrentPiece(keyboardMovementX);
+      if (keyboardMovementY != 0) {
+        board.runGameTick();
+        board.runTimer();
+      }
     });
   }
 
@@ -52,20 +60,35 @@ class _BoardGuiState extends State<BoardGui> {
       children: [
         Center(
           child: GestureDetector(
-            onHorizontalDragUpdate: (details) {
-              if (details.delta.distance > 2 * RelSize(context).pixel()) {
-                movement = details.delta.direction > 0 ? -1 : 1;
-              } else {
-                movement = 0;
+            onPanStart: (details) {
+              initHorizontalPieceSwipePos = board.pieceX;
+              initSwipePos = details.globalPosition;
+              currentSwipePos = details.globalPosition;
+            },
+            onPanUpdate: (details) {
+              if (board.isNewPiece()) {
+                initSwipePos = details.globalPosition;
+                currentSwipePos = details.globalPosition;
+                initHorizontalPieceSwipePos = board.pieceX;
               }
-            },
-            onHorizontalDragEnd: (_) {
-              movement = 0;
-            },
-            onVerticalDragEnd: (details) {
-              if (details.velocity.pixelsPerSecond.distance >
-                  4 * RelSize(context).pixel()) {
+              double xDelta = details.globalPosition.dx - initSwipePos.dx;
+              double absYDelta = details.globalPosition.dy - initSwipePos.dy;
+              double yDelta = details.globalPosition.dy - currentSwipePos.dy;
+              int pieceDelta = (board.pieceX - initHorizontalPieceSwipePos);
+              board.moveCurrentPiece(
+                  xDelta * board.width ~/ widget.maxSize - pieceDelta);
+              if (absYDelta > widget.maxSize / 3) {
                 board.fastForward();
+                initSwipePos = details.globalPosition;
+                currentSwipePos = details.globalPosition;
+                initHorizontalPieceSwipePos = board.pieceX;
+              }
+              if (yDelta > widget.maxSize / board.height) {
+                board.runGameTick();
+                currentSwipePos = details.globalPosition;
+              }
+              if (yDelta < 0) {
+                currentSwipePos = details.globalPosition;
               }
             },
             onTap: () {
@@ -78,18 +101,19 @@ class _BoardGuiState extends State<BoardGui> {
                   board.fastForward();
                 }
                 if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
-                  movement = -1;
+                  keyboardMovementX = -1;
                 } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
-                  movement = 1;
+                  keyboardMovementX = 1;
                 } else {
-                  movement = 0;
+                  keyboardMovementX = 0;
                 }
                 if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
                   board.rotateCurrentPiece();
                 }
                 if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
-                  board.runGameTick();
-                  board.runTimer();
+                  keyboardMovementY = 1;
+                } else {
+                  keyboardMovementY = 0;
                 }
               },
               child: Column(

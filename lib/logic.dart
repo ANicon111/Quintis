@@ -13,6 +13,9 @@ class Board {
 
   Piece currentPiece = Pieces.random();
   int currentPieceRotation = Random().nextInt(4);
+
+  bool newPiece = true;
+
   int pieceX = 0;
   int pieceY = 0;
 
@@ -36,6 +39,14 @@ class Board {
   }
 
   //piece-related functions
+  bool isNewPiece() {
+    if (newPiece) {
+      newPiece = false;
+      return true;
+    }
+    return false;
+  }
+
   void setCurrentPiece() {
     setPiece(board, currentPiece, currentPieceRotation, pieceY, pieceX);
   }
@@ -98,7 +109,7 @@ class Board {
   void pauseTimer() {
     gameTimer?.cancel();
     if (elapsedTime.elapsed < frequency * 2) {
-      gameTimer = Timer(frequency * 0.5, () {
+      gameTimer = Timer(frequency, () {
         if (board.isNotEmpty) runGameTick();
         runTimer();
       });
@@ -116,7 +127,7 @@ class Board {
 
   void fastForward() {
     if (!gameOver) {
-      while (pieceY != 0) {
+      while (!isNewPiece()) {
         runGameTick();
       }
     }
@@ -148,6 +159,7 @@ class Board {
       if (isPosValid(
           board, currentPiece, currentPieceRotation, pieceY + 1, pieceX)) {
         pieceY++;
+        newPiece = false;
       } else {
         setCurrentPiece();
         linesToPoints();
@@ -157,6 +169,7 @@ class Board {
         nextPieceRotation = Random().nextInt(4);
         pieceX = width ~/ 2 - 2;
         pieceY = 0;
+        newPiece = true;
       }
       if (isPosValid(
           board, currentPiece, currentPieceRotation, pieceY, pieceX)) {
