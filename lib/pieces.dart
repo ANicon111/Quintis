@@ -225,6 +225,7 @@ class Pieces {
   }
 
   static void removeFromStorage(int i) {
+    enable(i + 10);
     int n = int.parse(GetStorage("quintis/data").read("number"));
     n--;
     GetStorage("quintis/data").write("number", n.toString());

@@ -19,11 +19,12 @@ class Board {
   int pieceX = 0;
   int pieceY = 0;
 
-  Duration frequency = const Duration(milliseconds: 750);
+  Duration frequency = const Duration(milliseconds: 1000);
   Timer? gameTimer;
   Stopwatch elapsedTime = Stopwatch();
   bool gameOver = false;
-  int points = 0;
+  double points = 0;
+  int difficulty = 5;
   final Function updateGui;
 
   static void _() {}
@@ -92,6 +93,7 @@ class Board {
     pieceX = width ~/ 2 - 2;
     points = 0;
     gameOver = false;
+    difficulty = 5;
     runTimer();
     updateGui();
   }
@@ -144,7 +146,11 @@ class Board {
       if (isCompleteLine) completeLines.add(i);
     }
     int lines = completeLines.length;
-    points += (100 + width) * ((1 << lines) - 1);
+    points += (100 + width) * ((1 << lines) - 1) * difficulty;
+    if (lines > 0 && difficulty < height * 10) {
+      difficulty++;
+      frequency = Duration(milliseconds: 5000 ~/ difficulty);
+    }
     for (int line in completeLines) {
       board.removeAt(line);
       board = board.reversed.toList();

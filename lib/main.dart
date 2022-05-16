@@ -35,6 +35,10 @@ class Pages extends StatefulWidget {
 
 class _PagesState extends State<Pages> {
   bool settingsOpen = false;
+  int width = 25;
+
+  int height = 25;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,10 +56,15 @@ class _PagesState extends State<Pages> {
         ],
       ),
       body: settingsOpen
-          ? const Settings()
+          ? Settings(
+              setWidth: (int width) => this.width = width,
+              setHeight: (int height) => this.height = height,
+              getWidth: () => width,
+              getHeight: () => height,
+            )
           : BoardGui(
-              height: 25,
-              width: 25,
+              height: height,
+              width: width,
               maxSize: 1000 * RelSize(context).pixel() -
                   AppBar().preferredSize.height,
             ),

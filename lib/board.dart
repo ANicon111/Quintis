@@ -37,13 +37,6 @@ class _BoardGuiState extends State<BoardGui> {
     board = Board(widget.width, widget.height, () {
       setState(() {});
     });
-    horizontalTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-      if (keyboardMovementX != 0) board.moveCurrentPiece(keyboardMovementX);
-      if (keyboardMovementY != 0) {
-        board.runGameTick();
-        board.runTimer();
-      }
-    });
   }
 
   @override
@@ -102,18 +95,45 @@ class _BoardGuiState extends State<BoardGui> {
                 }
                 if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
                   keyboardMovementX = -1;
+                  if (horizontalTimer == null) {
+                    board.moveCurrentPiece(keyboardMovementX);
+                  }
+                  horizontalTimer ??=
+                      Timer(const Duration(milliseconds: 500), () {
+                    horizontalTimer = Timer.periodic(
+                        Duration(milliseconds: 2000 ~/ board.width), (_) {
+                      board.moveCurrentPiece(keyboardMovementX);
+                    });
+                  });
                 } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
                   keyboardMovementX = 1;
+                  if (horizontalTimer == null) {
+                    board.moveCurrentPiece(keyboardMovementX);
+                  }
+                  horizontalTimer ??=
+                      Timer(const Duration(milliseconds: 500), () {
+                    horizontalTimer = Timer.periodic(
+                        Duration(milliseconds: 2000 ~/ board.width), (_) {
+                      board.moveCurrentPiece(keyboardMovementX);
+                    });
+                  });
+                } else if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+                  if (horizontalTimer == null) {
+                    board.runGameTick();
+                  }
+                  horizontalTimer ??=
+                      Timer(const Duration(milliseconds: 500), () {
+                    horizontalTimer = Timer.periodic(
+                        Duration(milliseconds: 2000 ~/ board.width), (_) {
+                      board.runGameTick();
+                    });
+                  });
                 } else {
-                  keyboardMovementX = 0;
+                  horizontalTimer?.cancel();
+                  horizontalTimer = null;
                 }
                 if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
                   board.rotateCurrentPiece();
-                }
-                if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
-                  keyboardMovementY = 1;
-                } else {
-                  keyboardMovementY = 0;
                 }
               },
               child: Column(
@@ -171,7 +191,7 @@ class _BoardGuiState extends State<BoardGui> {
                                 width: 100 * RelSize(context).pixel(),
                               ),
                               Text(
-                                "Score: " + board.points.toString(),
+                                "Score: " + board.points.toStringAsFixed(0),
                                 style: TextStyle(
                                     fontSize: 64 * RelSize(context).pixel()),
                               ),
@@ -202,7 +222,7 @@ class _BoardGuiState extends State<BoardGui> {
                             TextStyle(fontSize: 160 * RelSize(context).pixel()),
                       ),
                       Text(
-                        "Score: " + board.points.toString(),
+                        "Score: " + board.points.toStringAsFixed(0),
                         style:
                             TextStyle(fontSize: 64 * RelSize(context).pixel()),
                       ),
