@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:quintis/cell.dart';
 import 'package:quintis/definitions.dart';
 import 'package:quintis/pieces.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  final Function setWidth;
+  final Function setHeight;
+  final Function getWidth;
+  final Function getHeight;
+  const Settings(
+      {Key? key,
+      required this.setWidth,
+      required this.setHeight,
+      required this.getWidth,
+      required this.getHeight})
+      : super(key: key);
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -30,6 +41,34 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
+        SizedBox(
+          width: 100 * RelSize(context).pixel(),
+          child: TextFormField(
+            decoration: const InputDecoration(label: Text("Width:")),
+            onChanged: (val) {
+              if (int.tryParse(val) != null) widget.setWidth(int.parse(val));
+            },
+            initialValue: widget.getWidth().toString(),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 100 * RelSize(context).pixel(),
+          child: TextFormField(
+            decoration: const InputDecoration(label: Text("Height:")),
+            onChanged: (val) {
+              if (int.tryParse(val) != null) widget.setHeight(int.parse(val));
+            },
+            initialValue: widget.getHeight().toString(),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+          ),
+        ),
         PieceAdder(
           pieceCount: pieceCount,
           increasePieceCount: increasePieceCount,
@@ -62,7 +101,6 @@ class _PieceAdderState extends State<PieceAdder> {
     return Column(
       children: [
         Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: List.generate(
             5,
             (i) => Row(
@@ -247,7 +285,6 @@ class _PieceListState extends State<PieceList> {
                             10 * RelSize(context).pixel(),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.not_interested,
@@ -288,7 +325,6 @@ class _PieceListState extends State<PieceList> {
                             10 * RelSize(context).pixel(),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.close,
@@ -367,7 +403,6 @@ class _PieceListState extends State<PieceList> {
                             10 * RelSize(context).pixel(),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.not_interested,
