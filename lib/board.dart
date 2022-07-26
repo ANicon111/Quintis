@@ -218,13 +218,15 @@ class _BoardGuiState extends State<BoardGui> {
                     children: [
                       Text(
                         "Game over",
-                        style:
-                            TextStyle(fontSize: 160 * RelSize(context).pixel()),
+                        style: TextStyle(
+                            fontSize: 160 * RelSize(context).pixel(),
+                            color: Colors.white),
                       ),
                       Text(
                         "Score: " + board.points.toStringAsFixed(0),
-                        style:
-                            TextStyle(fontSize: 64 * RelSize(context).pixel()),
+                        style: TextStyle(
+                            fontSize: 64 * RelSize(context).pixel(),
+                            color: Colors.white),
                       ),
                       const Spacer(),
                       Padding(
