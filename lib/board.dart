@@ -76,7 +76,7 @@ class _BoardGuiState extends State<BoardGui> {
                 currentSwipePos = details.globalPosition;
                 initHorizontalPieceSwipePos = board.pieceX;
               }
-              if (yDelta > widget.maxSize / board.height) {
+              if (yDelta > widget.maxSize / board.height && yDelta > xDelta) {
                 board.runGameTick();
                 currentSwipePos = details.globalPosition;
               }
